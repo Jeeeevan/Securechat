@@ -1,1 +1,1 @@
-# Securechat
+Secure Chat Application using Flask and Python
