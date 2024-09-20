@@ -12,7 +12,7 @@
 <script type="text/javascript">
     $(document).ready(function(){
         // Establish a connection to the SocketIO server
-        var socket = io("http://localhost:5000");
+        var socket = io("http://192.168.56.1:5000");
 
         // Handle when the client successfully connects to the server
         socket.on('connect', function(){
