@@ -5,12 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BlahBlah Crypto</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.esm.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.js"></script>
 </head>
 <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh;">
-    
-    
 
+<script type="text/javascript">
+    $(document).ready(function(){
+        // Establish a connection to the SocketIO server
+        var socket = io("http://localhost:5000");
+
+        // Handle when the client successfully connects to the server
+        socket.on('connect', function(){
+            console.log("Connected to the server");
+            // Notify the server that the user is connected
+            socket.emit('user_connected', "User connected!");
+        });
+
+        // Handle incoming messages from the server
+        socket.on('message', function(data){
+            console.log("Received message: ", data);
+            $('#messages').append('<p>' + data + '</p>');  // Display the message in the messages div
+        });
+
+        // Function for sending a message to the server when the Send button is clicked
+        $('#sendBtn').on('click', function(){
+            var username = $('#username').val();
+            var message = $('#message').val();
+
+            // Ensure that both the username and message fields are filled out
+            if (username && message) {
+                console.log("Sending message: " + username + ': ' + message);
+                // Send the message to the server with the username and message
+                socket.emit('send_message', {
+                    username: username,
+                    message: message
+                });
+                // Clear the message input after sending
+                $('#message').val('');
+            } else {
+                alert("Please enter both a username and a message.");
+            }
+        });
+    });
+</script>
 
     <div style="background-color: #fff; box-shadow: 0px 4px 12px rgba(0,0,0,0.1); width: 400px; padding: 20px; border-radius: 8px;">
         <h2 style="text-align: center; color: #333;">BlahBlah Crypto Chat</h2>
@@ -24,36 +61,6 @@
             Send
         </button>
     </div>
-<script type="text/javascript">
-    $(document).ready(function(){
-            // Establish a connection to the SocketIO server
-        var socket = io.connect("http://localhost:5000");
-            
-        socket.on('connect', function(){
-            console.log("Connected to the server");
-            socket.emit('user_connected', "User connected!"); // Use custom event for connecting
-        });
-    
-            // Handle incoming messages
-        socket.on('message', function(data){
-            console.log("Received message: ", data);
-            $('#messages').append($('<p>').text(data));
-        });
-    
-            // Send message when the button is clicked
-        $('#sendBtn').on('click', function(){
-            var username = $('#username').val();
-            var message = $('#message').val();
-                
-            if (username && message) {
-                console.log("Sending message: " + username + ': ' + message);
-                socket.emit('send_message', {username: username, message: message});  // Send the message as an object
-                $('#message').val('');  // Clear the message input after sending
-            } else {
-                console.log("Username and message are required");
-            }
-        });
-    });
-</script>
+
 </body>
 </html>
