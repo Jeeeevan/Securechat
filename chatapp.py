@@ -1,15 +1,22 @@
 from flask import Flask, render_template
-from flask_socketio import SocketIO, send
+from flask_socketio import SocketIO, emit
 
 app = Flask(__name__)
-app.config['SECRET'] = "secret!123" #Secret key
-socketio = SocketIO(app, cors_allowed_origins="*") #Allowing Cross origin
+app.config['SECRET_KEY'] = "secret!123"  # Secret key
+socketio = SocketIO(app, cors_allowed_origins="*")  # Allowing Cross-Origin
 
-@socketio.on('message')
-def handle_message(message):
-    print("Received message: " + message)
-    if message != "User connected!":
-        send(message, broadcast=True)
+# Handle user connected event
+@socketio.on('user_connected')
+def handle_user_connected(data):
+    print("User connected: " + data)
+    emit('message', data, broadcast=True)  # Broadcast to all users
+
+# Handle message event
+@socketio.on('send_message')
+def handle_send_message(data):
+    print(f"Received message from {data['username']}: {data['message']}")
+    full_message = f"{data['username']}: {data['message']}"
+    emit('message', full_message, broadcast=True)  # Broadcast the message to all clients
 
 @app.route('/')
 def index():
