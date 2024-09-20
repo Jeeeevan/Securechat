@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlahBlah Crypto</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.esm.min.js"></script>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh;">
+    
+    
+
+
+    <div style="background-color: #fff; box-shadow: 0px 4px 12px rgba(0,0,0,0.1); width: 400px; padding: 20px; border-radius: 8px;">
+        <h2 style="text-align: center; color: #333;">BlahBlah Crypto Chat</h2>
+        <div id="messages" style="background-color: #f9f9f9; border: 1px solid #ddd; height: 200px; overflow-y: scroll; padding: 10px; border-radius: 4px; margin-bottom: 15px;">
+        
+        </div>
+
+        <input type="text" id="username" placeholder="Username" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px;">
+        <input type="text" id="message" placeholder="Message" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px;">
+        <button id="sendBtn" style="width: 100%; padding: 10px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            Send
+        </button>
+    </div>
+<script type="text/javascript">
+    $(document).ready(function(){
+            // Establish a connection to the SocketIO server
+        var socket = io.connect("http://localhost:5000");
+            
+        socket.on('connect', function(){
+            console.log("Connected to the server");
+            socket.emit('user_connected', "User connected!"); // Use custom event for connecting
+        });
+    
+            // Handle incoming messages
+        socket.on('message', function(data){
+            console.log("Received message: ", data);
+            $('#messages').append($('<p>').text(data));
+        });
+    
+            // Send message when the button is clicked
+        $('#sendBtn').on('click', function(){
+            var username = $('#username').val();
+            var message = $('#message').val();
+                
+            if (username && message) {
+                console.log("Sending message: " + username + ': ' + message);
+                socket.emit('send_message', {username: username, message: message});  // Send the message as an object
+                $('#message').val('');  // Clear the message input after sending
+            } else {
+                console.log("Username and message are required");
+            }
+        });
+    });
+</script>
+</body>
+</html>
