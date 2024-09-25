@@ -9,45 +9,56 @@
 </head>
 <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh;">
 
-<script type="text/javascript">
-    $(document).ready(function(){
-        // Establish a connection to the SocketIO server
-        var socket = io("http://192.168.56.1:5000");
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
 
-        // Handle when the client successfully connects to the server
-        socket.on('connect', function(){
-            console.log("Connected to the server");
-            // Notify the server that the user is connected
-            socket.emit('user_connected', "User connected!");
+    <script type="text/javascript">
+        $(document).ready(function(){
+            // Establish a connection to the SocketIO server
+            var socket = io("http://192.168.1.3:5000");
+    
+            // Handle when the client successfully connects to the server
+            socket.on('connect', function(){
+                console.log("Connected to the server");
+                socket.emit('user_connected', "User connected!");
+            });
+    
+            // Handle incoming messages from the server
+            socket.on('message', function(data){
+                var username = data.username;
+                var encryptedMessage = data.message;
+    
+                console.log("Received encrypted message: " + encryptedMessage);
+    
+                // Display the message in the chat window
+                $('#messages').append('<p><strong>' + username + ':</strong> ' + encryptedMessage + '</p>');
+            });
+    
+            // Sending message to the server
+            $('#sendBtn').on('click', function(){
+                var username = $('#username').val();
+                var message = $('#message').val();
+    
+                if (username && message) {
+                    console.log("Sending message: " + username + ': ' + message);
+    
+                    // Send the message to the server
+                    socket.emit('send_message', {
+                        username: username,
+                        message: message
+                    });
+    
+                    // Clear the input field after sending
+                    $('#message').val('');
+                } else {
+                    alert("Please enter both a username and a message.");
+                }
+            });
         });
+    </script>
+    
 
-        // Handle incoming messages from the server
-        socket.on('message', function(data){
-            console.log("Received message: ", data);
-            $('#messages').append('<p>' + data + '</p>');  // Display the message in the messages div
-        });
-
-        // Function for sending a message to the server when the Send button is clicked
-        $('#sendBtn').on('click', function(){
-            var username = $('#username').val();
-            var message = $('#message').val();
-
-            // Ensure that both the username and message fields are filled out
-            if (username && message) {
-                console.log("Sending message: " + username + ': ' + message);
-                // Send the message to the server with the username and message
-                socket.emit('send_message', {
-                    username: username,
-                    message: message
-                });
-                // Clear the message input after sending
-                $('#message').val('');
-            } else {
-                alert("Please enter both a username and a message.");
-            }
-        });
-    });
-</script>
+    
+    
 
     <div style="background-color: #fff; box-shadow: 0px 4px 12px rgba(0,0,0,0.1); width: 400px; padding: 20px; border-radius: 8px;">
         <h2 style="text-align: center; color: #333;">BlahBlah Crypto Chat</h2>
