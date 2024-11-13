@@ -53,4 +53,4 @@ def index():
     return render_template("index.html")
 
 if __name__ == "__main__":
-    socketio.run(app, host="192.168.1.3", port=5000, debug=True)
+    socketio.run(app, host="192.168.94.193", port=5000, debug=True)
